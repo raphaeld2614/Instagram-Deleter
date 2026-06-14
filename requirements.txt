@@ -1,0 +1,4 @@
+# Runtime dependencies (pinned to the versions this app was developed against).
+# PyInstaller is installed separately by build/build.ps1 since it is build-only.
+undetected-chromedriver==3.5.5
+selenium==4.44.0

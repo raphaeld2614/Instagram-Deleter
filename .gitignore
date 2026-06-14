@@ -1,0 +1,14 @@
+# Local Chrome profile captured during development — must never be committed or bundled.
+instagram_profile/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Build artifacts
+build/_work/
+dist/
+*.spec~
