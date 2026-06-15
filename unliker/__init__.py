@@ -1,4 +1,4 @@
-"""Instagram Eraser — a small desktop app that mass-erases Instagram content.
+"""Instagram Deleter — a small desktop app that mass-erases Instagram content.
 
 It can remove your Likes (posts & reels) or your Reposts (reels), chosen from a
 dropdown. This package wraps the original Selenium / undetected_chromedriver

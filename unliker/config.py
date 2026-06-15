@@ -1,6 +1,6 @@
 """Application paths, persisted settings, and Chrome detection.
 
-Everything user-writable lives under %LOCALAPPDATA%\\InstagramUnliker so that the
+Everything user-writable lives under %LOCALAPPDATA%\\InstagramDeleter so that the
 login session survives across runs even when the app is a frozen PyInstaller exe
 (where the executable's own directory is read-only / a temp extraction dir).
 """
@@ -10,8 +10,8 @@ import os
 import shutil
 from pathlib import Path
 
-APP_NAME = "InstagramEraser"        # used for the per-user data folder name
-APP_DISPLAY_NAME = "Instagram Eraser"  # shown in the window title / installer
+APP_NAME = "InstagramDeleter"        # used for the per-user data folder name
+APP_DISPLAY_NAME = "Instagram Deleter"  # shown in the window title / installer
 CHROME_DOWNLOAD_URL = "https://www.google.com/chrome/"
 
 # Each "erase mode" maps a dropdown choice to its Instagram activity page and the

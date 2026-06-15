@@ -1,8 +1,8 @@
-# Builds the Instagram Eraser into a distributable Windows app.
+# Builds the Instagram Deleter into a distributable Windows app.
 #
 #   1. Creates an isolated virtual environment (.venv)
 #   2. Installs runtime dependencies + PyInstaller
-#   3. Runs PyInstaller (onedir, windowed) -> dist\InstagramEraser\
+#   3. Runs PyInstaller (onedir, windowed) -> dist\InstagramDeleter\
 #   4. Wraps it in an Inno Setup installer if iscc.exe is available,
 #      otherwise zips the folder as a fallback.
 #
@@ -36,9 +36,9 @@ Write-Host "Running PyInstaller..." -ForegroundColor Cyan
 & $venvPy -m PyInstaller build\unliker.spec --noconfirm --distpath dist --workpath build\_work
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller build failed." }
 
-$appDir = Join-Path $root "dist\InstagramEraser"
-if (-not (Test-Path (Join-Path $appDir "InstagramEraser.exe"))) {
-    throw "Build did not produce InstagramEraser.exe."
+$appDir = Join-Path $root "dist\InstagramDeleter"
+if (-not (Test-Path (Join-Path $appDir "InstagramDeleter.exe"))) {
+    throw "Build did not produce InstagramDeleter.exe."
 }
 Write-Host "Build succeeded: $appDir" -ForegroundColor Green
 
@@ -53,10 +53,10 @@ if ($iscc) {
     Write-Host "Building installer with Inno Setup..." -ForegroundColor Cyan
     & $iscc "build\installer.iss"
     if ($LASTEXITCODE -ne 0) { throw "Inno Setup compilation failed." }
-    Write-Host "Installer created: dist\InstagramEraser-Setup.exe" -ForegroundColor Green
+    Write-Host "Installer created: dist\InstagramDeleter-Setup.exe" -ForegroundColor Green
 } else {
     Write-Host "Inno Setup (iscc.exe) not found - creating a zip fallback instead." -ForegroundColor Yellow
-    $zip = Join-Path $root "dist\InstagramEraser.zip"
+    $zip = Join-Path $root "dist\InstagramDeleter.zip"
     if (Test-Path $zip) { Remove-Item $zip -Force }
     # Freshly written files can be briefly locked by antivirus scanning; retry.
     for ($attempt = 1; $attempt -le 3; $attempt++) {

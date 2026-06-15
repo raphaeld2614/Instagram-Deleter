@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec for the Instagram Eraser (onedir, windowed).
+"""PyInstaller spec for the Instagram Deleter (onedir, windowed).
 
 Build from the project root with:
     pyinstaller build/unliker.spec --noconfirm
@@ -52,7 +52,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="InstagramEraser",
+    name="InstagramDeleter",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -73,5 +73,5 @@ coll = COLLECT(
     strip=False,
     upx=False,
     upx_exclude=[],
-    name="InstagramEraser",
+    name="InstagramDeleter",
 )

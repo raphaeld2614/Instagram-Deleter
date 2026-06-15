@@ -1,4 +1,4 @@
-# Instagram Eraser
+# Instagram Deleter
 
 A small Windows desktop app that mass-erases your Instagram interactions. From a
 dropdown you choose **what** to erase:
@@ -28,9 +28,9 @@ batch size and pacing, and watch a live log with a running count.
   driver once and caches it.
 
 ### Install & run
-- **Installer:** run `InstagramEraser-Setup.exe` and launch from the Start Menu /
+- **Installer:** run `InstagramDeleter-Setup.exe` and launch from the Start Menu /
   desktop shortcut, **or**
-- **Portable:** unzip `InstagramEraser.zip` and run `InstagramEraser.exe`.
+- **Portable:** unzip `InstagramDeleter.zip` and run `InstagramDeleter.exe`.
 
 ### How to use
 1. In **What to erase**, choose **Likes** or **Reposts**.
@@ -41,7 +41,7 @@ batch size and pacing, and watch a live log with a running count.
 6. Click **Stop** at any time. Closing the window stops everything and closes Chrome.
 
 Your settings and login session are stored under
-`%LOCALAPPDATA%\InstagramEraser` (so they persist between runs).
+`%LOCALAPPDATA%\InstagramDeleter` (so they persist between runs).
 
 ---
 
@@ -70,7 +70,7 @@ build/
 ```
 
 > The package directory is still named `unliker/` for continuity; the product is
-> "Instagram Eraser". Adding a new erase target is just a new entry in
+> "Instagram Deleter". Adding a new erase target is just a new entry in
 > `config.MODES` (a label, URL, path token, and the button verb(s) Instagram uses).
 
 ### Build a distributable app
@@ -78,9 +78,9 @@ build/
 powershell -ExecutionPolicy Bypass -File build\build.ps1
 ```
 This creates `.venv`, installs deps + PyInstaller, builds
-`dist\InstagramEraser\InstagramEraser.exe`, then produces
-`dist\InstagramEraser-Setup.exe` (if [Inno Setup](https://jrsoftware.org/isdl.php)
-is installed) or `dist\InstagramEraser.zip` as a fallback.
+`dist\InstagramDeleter\InstagramDeleter.exe`, then produces
+`dist\InstagramDeleter-Setup.exe` (if [Inno Setup](https://jrsoftware.org/isdl.php)
+is installed) or `dist\InstagramDeleter.zip` as a fallback.
 
 ### Build notes / troubleshooting
 - **onedir, not onefile:** `undetected_chromedriver` patches and launches a driver
