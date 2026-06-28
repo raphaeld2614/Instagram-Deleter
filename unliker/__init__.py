@@ -6,4 +6,4 @@ automation in a Tkinter GUI with start/stop control, tunable settings, a live
 log, and a persistent login session.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"

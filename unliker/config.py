@@ -7,6 +7,7 @@ login session survives across runs even when the app is a frozen PyInstaller exe
 
 import json
 import os
+import re
 import shutil
 from pathlib import Path
 
@@ -128,3 +129,59 @@ def find_chrome() -> str | None:
         pass
 
     return None
+
+
+def get_chrome_major_version() -> "int | None":
+    """Best-effort detection of the installed Chrome's *major* version (e.g. 149).
+
+    Passing this to undetected_chromedriver as ``version_main`` makes it download
+    the chromedriver that matches the user's Chrome, preventing the common
+    "This version of ChromeDriver only supports Chrome version N" mismatch. Returns
+    None when it can't be determined (the caller then lets UC auto-detect and relies
+    on the engine's automatic retry to correct any mismatch).
+    """
+    # 1) Registry: Chrome records its version under BLBeacon for per-user (HKCU)
+    #    and system-wide (HKLM, including the 32-bit registry view) installs.
+    try:
+        import winreg  # noqa: PLC0415 - Windows-only, imported lazily
+
+        for root, subkey in (
+            (winreg.HKEY_CURRENT_USER, r"Software\Google\Chrome\BLBeacon"),
+            (winreg.HKEY_LOCAL_MACHINE, r"Software\Google\Chrome\BLBeacon"),
+            (winreg.HKEY_LOCAL_MACHINE, r"Software\Wow6432Node\Google\Chrome\BLBeacon"),
+        ):
+            try:
+                with winreg.OpenKey(root, subkey) as key:
+                    value, _ = winreg.QueryValueEx(key, "version")
+                    major = _major_from_version(value)
+                    if major:
+                        return major
+            except OSError:
+                continue
+    except ImportError:
+        pass
+
+    # 2) Chrome keeps its binaries in a version-named folder next to chrome.exe
+    #    (…\Application\149.0.7827.199\); use the newest such folder as the version.
+    chrome = find_chrome()
+    if chrome:
+        app_dir = Path(chrome).parent
+        if app_dir.is_dir():
+            majors = [
+                _major_from_version(child.name)
+                for child in app_dir.iterdir()
+                if child.is_dir() and re.fullmatch(r"\d+(\.\d+){3}", child.name)
+            ]
+            majors = [m for m in majors if m]
+            if majors:
+                return max(majors)
+
+    return None
+
+
+def _major_from_version(version) -> "int | None":
+    """Return the integer major component of an 'A.B.C.D' version string, or None."""
+    try:
+        return int(str(version).split(".")[0])
+    except (ValueError, AttributeError, IndexError):
+        return None

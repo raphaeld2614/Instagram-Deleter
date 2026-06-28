@@ -88,9 +88,11 @@ is installed) or `dist\InstagramDeleter.zip` as a fallback.
 - **Python version:** if PyInstaller errors on a very new Python or the Microsoft
   Store build of Python, install a stable [python.org](https://www.python.org/)
   release (3.12 or 3.13), delete `.venv`, and re-run the build script.
-- **Chrome 149+ / driver mismatch:** if launching Chrome shows a version error, run
-  `pip install -U undetected-chromedriver` and rebuild. The app surfaces such errors
-  with a friendly message instead of crashing.
+- **Chrome / driver version mismatch:** the app detects the installed Chrome version
+  and tells `undetected_chromedriver` to download the matching driver; if they still
+  disagree it reads the real version from the error and retries once automatically,
+  so a driver/Chrome mismatch self-corrects. A first run still needs internet to
+  download the matching driver, which is then cached.
 - **Reposts button wording:** the Reposts mode assumes Instagram's action/confirm
   button reads "Remove" (it also still matches "Unlike"). If Instagram uses a
   different word, update the `verbs` list for `reposts` in `config.MODES`.

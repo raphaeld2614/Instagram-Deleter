@@ -10,6 +10,7 @@ The XPath selectors and the net-casting grid logic are preserved verbatim.
 """
 
 import random
+import re
 import threading
 import time
 
@@ -134,23 +135,70 @@ class UnlikerEngine:
 
         config.ensure_dirs()
         self.log("[*] Booting up stealth browser...")
+
+        # Match the chromedriver to the user's installed Chrome up front so the two
+        # versions can't disagree (the "session not created: This version of
+        # ChromeDriver only supports Chrome version N" failure).
+        version_main = config.get_chrome_major_version()
+        if version_main:
+            self.log(f"[*] Detected Chrome {version_main}; fetching the matching driver.")
+        else:
+            self.log("[*] Chrome version unknown; letting the driver auto-detect.")
+
         try:
-            options = uc.ChromeOptions()
-            options.add_argument(f"--user-data-dir={config.PROFILE_DIR}")
-            options.add_argument(
-                f"--window-size={random.randint(1000, 1200)},{random.randint(800, 1000)}"
-            )
-            # Force English so the text-based selectors ('Select'/'Cancel') don't break.
-            options.add_argument("--lang=en-US")
-            # use_subprocess=False avoids UC re-spawning the (frozen) executable as a
-            # child process, which would otherwise relaunch the whole GUI.
-            self.driver = uc.Chrome(options=options, use_subprocess=False)
+            self.driver = self._launch_driver(version_main)
         except Exception as exc:  # noqa: BLE001 - surface any launch failure to the UI
-            raise ChromeLaunchError(self._describe_launch_error(exc)) from exc
+            # Safety net: if the driver and Chrome still disagree, the error text
+            # reports the real browser version — re-fetch that exact driver once so
+            # the user never has to deal with a version mismatch by hand.
+            retry_version = self._mismatched_browser_version(exc)
+            if retry_version and retry_version != version_main:
+                self.log(
+                    f"[!] Driver/Chrome mismatch; re-fetching the driver for "
+                    f"Chrome {retry_version} and retrying..."
+                )
+                time.sleep(1.5)  # let the failed Chrome exit and release the profile lock
+                try:
+                    self.driver = self._launch_driver(retry_version)
+                except Exception as exc2:  # noqa: BLE001
+                    raise ChromeLaunchError(self._describe_launch_error(exc2)) from exc2
+            else:
+                raise ChromeLaunchError(self._describe_launch_error(exc)) from exc
 
         self.driver.get(self.target_url)
         self.log("[*] Browser ready. Log in if needed and make sure you're on the 'Likes' page.")
         self._set_state("browser_open")
+
+    def _launch_driver(self, version_main):
+        """Build options and start undetected_chromedriver.
+
+        When ``version_main`` is set, UC downloads/patches the chromedriver for
+        exactly that Chrome major version instead of guessing.
+        """
+        options = uc.ChromeOptions()
+        options.add_argument(f"--user-data-dir={config.PROFILE_DIR}")
+        options.add_argument(
+            f"--window-size={random.randint(1000, 1200)},{random.randint(800, 1000)}"
+        )
+        # Force English so the text-based selectors ('Select'/'Cancel') don't break.
+        options.add_argument("--lang=en-US")
+        # use_subprocess=False avoids UC re-spawning the (frozen) executable as a
+        # child process, which would otherwise relaunch the whole GUI.
+        kwargs = {"options": options, "use_subprocess": False}
+        if version_main:
+            kwargs["version_main"] = version_main
+        return uc.Chrome(**kwargs)
+
+    @staticmethod
+    def _mismatched_browser_version(exc: Exception) -> "int | None":
+        """Extract the real Chrome major version from a version-mismatch error.
+
+        Selenium's 'session not created' message includes
+        'Current browser version is 149.0.7827.199'; returning 149 lets the caller
+        automatically re-fetch the matching driver.
+        """
+        match = re.search(r"Current browser version is (\d+)", str(exc))
+        return int(match.group(1)) if match else None
 
     @staticmethod
     def _describe_launch_error(exc: Exception) -> str:

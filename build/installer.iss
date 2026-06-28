@@ -4,7 +4,7 @@
 ; Produces dist\InstagramDeleter-Setup.exe from the PyInstaller onedir build.
 
 #define MyAppName "Instagram Deleter"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppExeName "InstagramDeleter.exe"
 
 [Setup]
